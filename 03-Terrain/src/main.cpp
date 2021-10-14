@@ -80,10 +80,10 @@ Model modelDartLegoRightLeg;
 // Model animate instance
 // Mayow
 Model mayowModelAnimate;
-// Terrain model instance
-Terrain terrain(-1, -1, 200, 8, "../Textures/heightmap.png");
 //Boy
 Model boyAnimate;
+// Terrain model instance
+Terrain terrain(-1, -1, 200, 10, "../Textures/mapAltura.png");
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
@@ -678,16 +678,17 @@ bool processInput(bool continueApplication) {
 	else if (modelSelected == 2 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		modelMatrixDart = glm::translate(modelMatrixDart, glm::vec3(0.02, 0.0, 0.0));
 
-	if (modelSelected == 2 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	/*if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 		modelMatrixMayow = glm::rotate(modelMatrixMayow, 0.02f, glm::vec3(0, 1, 0));
-	else if (modelSelected == 2 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		modelMatrixMayow = glm::rotate(modelMatrixMayow, -0.02f, glm::vec3(0, 1, 0));
-	if (modelSelected == 2 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(-0.02, 0.0, 0.0));
-	else if (modelSelected == 2 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.02, 0.0, 0.0));
-	
-	//Boy controls
+	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.0, 0.0, 0.02));
+	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(0.0, 0.0, -0.02));*/
+
+
+		//Boy controls
 	if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		modelMatrixBoy = glm::translate(modelMatrixBoy, glm::vec3(0.0f, 0.0f, 0.01f));
 		boyAnimate.setAnimationIndex(0);
@@ -697,14 +698,14 @@ bool processInput(bool continueApplication) {
 		boyAnimate.setAnimationIndex(0);
 	}
 	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		modelMatrixBoy = glm::translate(modelMatrixBoy, glm::vec3(-0.01f, 0.0f, 0.0f));
+		modelMatrixBoy = glm::rotate(modelMatrixBoy, -0.02f, glm::vec3(0, 1, 0));
 		boyAnimate.setAnimationIndex(0);
 	}
 	else if (modelSelected == 0 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		modelMatrixBoy = glm::translate(modelMatrixBoy, glm::vec3(0.01f, 0.0f, 0.0f));
+		modelMatrixBoy = glm::rotate(modelMatrixBoy, 0.02f, glm::vec3(0, 1, 0));
 		boyAnimate.setAnimationIndex(0);
 	}
-	
+
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -724,8 +725,6 @@ void applicationLoop() {
 
 	modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(13.0f, 0.05f, -5.0f));
 	modelMatrixMayow = glm::rotate(modelMatrixMayow, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-
-	modelMatrixBoy = glm::translate(modelMatrixBoy, glm::vec3(-3.0f, 0.05f, -5.0f));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -799,6 +798,7 @@ void applicationLoop() {
 		glBindTexture(GL_TEXTURE_2D, textureCespedID);
 		shaderMulLighting.setVectorFloat2("scaleUV", glm::value_ptr(glm::vec2(80, 80)));
 		terrain.setPosition(glm::vec3(100, 0, 100));
+		//terrain.enableWireMode();
 		terrain.render();
 		shaderMulLighting.setVectorFloat2("scaleUV", glm::value_ptr(glm::vec2(0, 0)));
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -901,8 +901,8 @@ void applicationLoop() {
 		/*******************************************
 		 * Custom Anim objects obj
 		 *******************************************/
-		glm::vec3 ejey = glm::normalize(terrain.getNormalTerrain(modelMatrixMayow[3][0], modelMatrixMayow[3][2]));
-		glm::vec3 ejex = glm::normalize(modelMatrixMayow[0]);
+		/*glm::vec3 ejey = terrain.getNormalTerrain(modelMatrixMayow[3][0], modelMatrixMayow[3][2]);
+		glm::vec3 ejex = modelMatrixMayow[0];
 		glm::vec3 ejez = glm::normalize(glm::cross(ejex, ejey));
 		modelMatrixMayow[0] = glm::vec4(ejex, 0.0f);
 		modelMatrixMayow[1] = glm::vec4(ejey, 0.0f);
@@ -911,11 +911,17 @@ void applicationLoop() {
 		glm::mat4 modelMatrixMayowBody = glm::mat4(modelMatrixMayow);
 		modelMatrixMayowBody = glm::scale(modelMatrixMayowBody, glm::vec3(0.021, 0.021, 0.021));
 		mayowModelAnimate.setAnimationIndex(0);
-		mayowModelAnimate.render(modelMatrixMayowBody);
+		mayowModelAnimate.render(modelMatrixMayowBody);*/
 
-		// Boy
+		/*MODEL BOY*/
 		glm::mat4 modelMatrixBoyBody = glm::mat4(modelMatrixBoy);
-		//modelMatrixBoyBody = glm::scale(modelMatrixBoyBody, glm::vec3(0.01, 0.01, 0.01));
+		glm::vec3 ejey = terrain.getNormalTerrain(modelMatrixBoy[3][0], modelMatrixBoy[3][2]);
+		glm::vec3 ejex = modelMatrixBoy[0];
+		glm::vec3 ejez = glm::normalize(glm::cross(ejex, ejey));
+		modelMatrixBoy[0] = glm::vec4(ejex, 0.0f);
+		modelMatrixBoy[1] = glm::vec4(ejey, 0.0f);
+		modelMatrixBoy[2] = glm::vec4(ejez, 0.0f);
+		modelMatrixBoy[3][1] = terrain.getHeightTerrain(modelMatrixBoy[3][0], modelMatrixBoy[3][2]);;
 		boyAnimate.render(modelMatrixBoyBody);
 		boyAnimate.setAnimationIndex(1);
 
