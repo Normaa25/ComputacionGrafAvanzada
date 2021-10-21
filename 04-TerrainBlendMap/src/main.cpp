@@ -95,7 +95,7 @@ GLuint textureTerrainBackgroundID, textureTerrainRID, textureTerrainGID, texture
 GLuint skyboxTextureID;
 
 GLenum types[6] = {
-GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+GL_TEXTURE_CUBE_MAP_POSITIVE_X,	
 GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
@@ -896,6 +896,9 @@ void applicationLoop() {
 
 	modelMatrixMayow = glm::translate(modelMatrixMayow, glm::vec3(13.0f, 0.05f, -5.0f));
 	modelMatrixMayow = glm::rotate(modelMatrixMayow, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+
+	modelMatrixChico = glm::translate(modelMatrixChico, glm::vec3(15.0f, 0.05f, -10.0f));
+	modelMatrixChico = glm::rotate(modelMatrixChico, glm::radians(-90.0f), glm::vec3(0, 1, 0));
 
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
