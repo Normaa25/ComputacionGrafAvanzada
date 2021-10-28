@@ -1263,6 +1263,33 @@ void applicationLoop() {
 		modelMatrixDartRightLeg = glm::rotate(modelMatrixDartRightLeg, rotDartRightLeg, glm::vec3(0, 0, 1));
 		modelMatrixDartRightLeg = glm::translate(modelMatrixDartRightLeg, glm::vec3(0, -1.12632, 0.423349));
 		modelDartLegoRightLeg.render(modelMatrixDartRightLeg);
+
+		//Animación llantas delanteras del lambo
+		glm::mat4 modelMatrixLamboFrontalWheels = glm::mat4(modelMatrixLamboChasis);
+		modelMatrixLamboFrontalWheels = glm::translate(modelMatrixLamboFrontalWheels, glm::vec3(0.967871, 0.396476, 1.40066));
+		modelMatrixLamboFrontalWheels = glm::rotate(modelMatrixLamboFrontalWheels, rotWheelslamY, glm::vec3(0, 1, 0));
+		modelMatrixLamboFrontalWheels = glm::rotate(modelMatrixLamboFrontalWheels, rotWheelslamX, glm::vec3(1, 0, 0));
+		modelMatrixLamboFrontalWheels = glm::translate(modelMatrixLamboFrontalWheels, glm::vec3(-0.967871, -0.396476, -1.40066));
+		modelLamboFrontLeftWheel.render(modelMatrixLamboFrontalWheels);
+		glm::mat4 modelMatrixLamboFrontalWheels2 = glm::mat4(modelMatrixLamboChasis);
+		modelMatrixLamboFrontalWheels2 = glm::translate(modelMatrixLamboFrontalWheels2, glm::vec3(-0.937188, 0.398345, 1.405));
+		modelMatrixLamboFrontalWheels2 = glm::rotate(modelMatrixLamboFrontalWheels2, rotWheelslamY, glm::vec3(0, 1, 0));
+		modelMatrixLamboFrontalWheels2 = glm::rotate(modelMatrixLamboFrontalWheels2, rotWheelslamX, glm::vec3(1, 0, 0));
+		modelMatrixLamboFrontalWheels2 = glm::translate(modelMatrixLamboFrontalWheels2, glm::vec3(0.937188, -0.398345, -1.405));
+		modelLamboFrontRightWheel.render(modelMatrixLamboFrontalWheels2);
+
+		//Animación llantas traceras del lambo
+		glm::mat4 modelMatrixLamboRearWheels = glm::mat4(modelMatrixLamboChasis);
+		modelMatrixLamboRearWheels = glm::translate(modelMatrixLamboRearWheels, glm::vec3(0.963535, 0.400812, -1.60434));
+		modelMatrixLamboRearWheels = glm::rotate(modelMatrixLamboRearWheels, rotWheelslamX, glm::vec3(1, 0, 0));//Unicamente rota en x
+		modelMatrixLamboRearWheels = glm::translate(modelMatrixLamboRearWheels, glm::vec3(-0.963535, -0.400812, 1.60434));
+		modelLamboRearLeftWheel.render(modelMatrixLamboRearWheels);
+		glm::mat4 modelMatrixLamboRearWheels2 = glm::mat4(modelMatrixLamboChasis);
+		modelMatrixLamboRearWheels2 = glm::translate(modelMatrixLamboRearWheels2, glm::vec3(-0.944403, 0.392139, -1.60434));
+		modelMatrixLamboRearWheels2 = glm::rotate(modelMatrixLamboRearWheels2, rotWheelslamX, glm::vec3(1, 0, 0));//Unicamente rota en x
+		modelMatrixLamboRearWheels2 = glm::translate(modelMatrixLamboRearWheels2, glm::vec3(0.944403, -0.392139, 1.60434));
+		modelLamboRearRightWheel.render(modelMatrixLamboRearWheels2);
+
 		// Se regresa el cull faces IMPORTANTE para la capa
 		glEnable(GL_CULL_FACE);
 
