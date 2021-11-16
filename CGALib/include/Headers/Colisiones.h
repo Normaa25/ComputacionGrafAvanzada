@@ -210,5 +210,17 @@ bool testOBBOBB(AbstractModel::OBB a, AbstractModel::OBB b){
 	return true;
 }
 
+bool testLABPlane(float p, float v, float min, float max, float &tmin, float &tmax) {
+	if (fabs(v) < 0.01)
+		return (p >= min && p <= max);
+	float ood = 1.0f/v;
+	float t1= (min -p) *ood;
+	float t2= (max -p) *ood;
+	if (t1 > t2) {
+		
+	
+	}
+
+}
 
 #endif /* COLISIONES_H_ */
