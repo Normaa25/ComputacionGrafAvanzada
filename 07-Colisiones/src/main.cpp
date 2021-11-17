@@ -1323,7 +1323,7 @@ void applicationLoop() {
 		glm::mat4 modelMatrixRay = glm::mat4(modelMatrixMayow);
 		modelMatrixRay = glm::translate(modelMatrixRay,glm::vec3(0, 1, 0));
 		glm::vec3 rayDirection = glm::normalize(glm::vec3(modelMatrixRay[2]));
-		glm::vec3 ori = glm::vec3(modelMatrixMayow[3]);
+		glm::vec3 ori = glm::vec3(modelMatrixRay[3]);
 		glm::vec3 tar = ori + 10.0f * rayDirection;
 		glm::vec3 dmd = ori + 5.0f *rayDirection;
 		modelMatrixRay[3] = glm::vec4(dmd, 1.0);
@@ -1515,7 +1515,7 @@ void applicationLoop() {
 				if (testSphereOBox(std::get<0>(jt->second), std::get<0>(it->second))) {
 					std::cout << "Collision" << it->first << "with" << jt->first << std::endl;
 					isCollision = true;
-					addOrUpdateCollisionDetection(collisionDetection, jt->first, isCollision);
+					addOrUpdateCollisionDetection(collisionDetection, jt->first, true);
 				}
 			}
 			addOrUpdateCollisionDetection(collisionDetection, it->first, isCollision);
@@ -1526,24 +1526,32 @@ void applicationLoop() {
 			std::map < std::string, std::tuple < AbstractModel::SBB, glm::mat4, glm::mat4> >::iterator it = collidersSBB.find(colIt->first);
 			std::map < std::string, std::tuple < AbstractModel::OBB, glm::mat4, glm::mat4> >::iterator jt = collidersOBB.find(colIt->first);
 			if (it != collidersSBB.end()) {
-				if (!colIt->second) {
+				if (!colIt->second)
 					addOrUpdateColliders(collidersSBB, it->first);
-				}
-				if (jt != collidersOBB.end()) {
-					if (!colIt->second)
-						addOrUpdateColliders(collidersOBB, jt->first);
-					else {
-						if (jt->first.compare("mayow") == 0)
-							modelMatrixMayow = std::get <1>(jt->second);
-					}
+			}
+			if (jt != collidersOBB.end()) {
+				if (!colIt->second)
+					addOrUpdateColliders(collidersOBB, jt->first);
+				else {
+					if (jt->first.compare("mayow") == 0)
+						modelMatrixMayow = std::get<1>(jt->second);
 				}
 			}
 		}
+	
 		
 		/*******************************************
-		 * Interpolation key frames with disconect objects
+		 * Raytest Colision
 		 *******************************************/
-		for(std::map)
+		for (std::map<std::string, std::tuple<AbstractModel::SBB, glm::mat4, glm::mat4> >::iterator it = collidersSBB.begin(); it != collidersSBB.end(); it++) {
+			float tray;
+			if (raySphereIntersect(ori, tar, rayDirection, std::get<0>(it->second), tray))
+				std::cout << "Colision" << it->first << "with" << "Ray" << std::endl;
+		}
+		for (std::map<std::string, std::tuple<AbstractModel::OBB, glm::mat4, glm::mat4> >::iterator it = collidersOBB.begin(); it != collidersOBB.end(); it++) {
+			if (intersectRayOBB (ori, tar, rayDirection, std::get<0>(it->second)))
+				std::cout << "Colision" << it->first << "with" << "Ray" << std::endl;
+		}
 
 		/*******************************************
 		 * Interpolation key frames with disconect objects
