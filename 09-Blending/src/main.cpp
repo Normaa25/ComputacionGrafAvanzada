@@ -1585,7 +1585,8 @@ void applicationLoop() {
 			}
 			break;
 		}
-
+		glEnable(GL_BLEND);
+		
 		glfwSwapBuffers(window);
 	}
 }
