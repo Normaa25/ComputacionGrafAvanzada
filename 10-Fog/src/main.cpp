@@ -256,7 +256,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 
 	// Inicialización de los shaders
 	shader.initialize("../Shaders/colorShader.vs", "../Shaders/colorShader.fs");
-	shaderSkybox.initialize("../Shaders/skyBox.vs", "../Shaders/skyBox.fs");
+	shaderSkybox.initialize("../Shaders/skyBox.vs", "../Shaders/skyBox_fog.fs");
 	shaderMulLighting.initialize("../Shaders/iluminacion_textura_animation_fog.vs", "../Shaders/multipleLights_fog.fs");
 	shaderTerrain.initialize("../Shaders/terrain_fog.vs", "../Shaders/terrain_fog.fs");
 
@@ -1026,6 +1026,16 @@ void applicationLoop() {
 		shaderTerrain.setMatrix4("view", 1, false,
 				glm::value_ptr(view));
 
+		/*******************************************
+		 * Propiedades de la neblina
+		 *******************************************/
+		shaderMulLighting.setVectorFloat3("fogColor", glm::value_ptr(glm::vec3(0.0, 0.0, 0.5)));
+		shaderMulLighting.setFloat("density", 0.06);
+		shaderMulLighting.setVectorFloat3("fogColor", glm::value_ptr(glm::vec3(0.0, 0.0, 0.5)));
+		shaderMulLighting.setFloat("density", 0.06);
+		shaderMulLighting.setFloat("lowerLimit", 0.0);
+		shaderMulLighting.setFloat("upperLimit", 0.08);
+		
 		/*******************************************
 		 * Propiedades Luz direccional
 		 *******************************************/
