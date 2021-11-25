@@ -56,6 +56,9 @@ Shader shaderSkybox;
 Shader shaderMulLighting;
 //Shader para el terreno
 Shader shaderTerrain;
+//Shader para las particulas
+Shader shaderFountineParticles;
+
 
 std::shared_ptr<Camera> camera(new ThirdPersonCamera());
 float distanceFromTarget = 7.0;
@@ -189,6 +192,12 @@ float GRAVITY = 1.81;
 double tmv = 0;
 double startTimeJump = 0;
 
+// Definición de varibles para el sistema de partículas.
+GLuint initVel, starTime;
+GLuint VAOParticles;
+GLuint nParticles= 8000;
+double currTimeParticlesAnimation, lasTimeParticlesAnimation;
+
 // Colliders
 std::map<std::string, std::tuple<AbstractModel::OBB, glm::mat4, glm::mat4> > collidersOBB;
 std::map<std::string, std::tuple<AbstractModel::SBB, glm::mat4, glm::mat4> > collidersSBB;
@@ -203,6 +212,61 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 void init(int width, int height, std::string strTitle, bool bFullScreen);
 void destroy();
 bool processInput(bool continueApplication = true);
+
+void initParticlesBuffers() {
+	//Generar los buffers
+	glGenBuffers(1, &initVel);
+	glGenBuffers(1, &starTime);
+
+	//Generar el parser de memoria para los buffers
+	int size = nParticles * 3 * sizeof(float);
+	glBindBuffer(GL_ARRAY_BUFFER, initVel);
+	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, starTime);
+	glBufferData(GL_ARRAY_BUFFER, nParticles * sizeof(float), NULL, GL_STATIC_DRAW);
+
+	//Llenado de la velocidad, iniciar con valores aleatorios
+	glm::vec3 v(0.0);
+	float velocity, theta, phi;
+	GLfloat * data = new GLfloat[nParticles * 3];
+	for (unsigned int i = 0; i < nParticles; i++) {
+		theta = glm::mix(0.0f, glm::pi<float>()/6.0f,((float)rand()/RAND_MAX));
+		phi = glm::mix(0.0f, glm::two_pi<float>(), ((float)rand() / RAND_MAX));
+		v.x = sinf(theta) * cos(phi);
+		v.y = cos(theta);
+		v.z = sinf(theta) * sinf(phi);
+		velocity = glm::mix(0.6f, 0.8f, ((float)rand()/RAND_MAX));
+		v = glm::normalize(v) * velocity;
+		data[3 * i] = v.x;
+		data[3 * i + 1] = v.y;
+		data[3 * i + 2] = v.z;
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, initVel);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+	glBindBuffer(GL_ARRAY_BUFFER,0);
+	delete[] data;
+	// Llenar el tiempo de inicio
+	data = new GLfloat[nParticles];
+	float time = 0.0f;
+	float rate = 0.00075;
+	for (unsigned int i = 0; i < nParticles; i++ ) {
+		data[i] = time;
+		time += rate;
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, starTime);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, nParticles * sizeof(float), data);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	delete[] data;
+	glGenVertexArrays(1, &VAOParticles);
+	glBindVertexArray(VAOParticles);
+	glBindBuffer(GL_ARRAY_BUFFER, initVel);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, starTime);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+	glBindVertexArray(0);
+}
 
 // Implementacion de todas las funciones.
 void init(int width, int height, std::string strTitle, bool bFullScreen) {
@@ -263,6 +327,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	shaderSkybox.initialize("../Shaders/skyBox.vs", "../Shaders/skyBox_fog.fs");
 	shaderMulLighting.initialize("../Shaders/iluminacion_textura_animation_fog.vs", "../Shaders/multipleLights_fog.fs");
 	shaderTerrain.initialize("../Shaders/terrain_fog.vs", "../Shaders/terrain_fog.fs");
+	shaderFountineParticles.initialize("../Shaders/particles.vs", "../partcles.fs");
 
 	// Inicializacion de los objetos.
 	skyboxSphere.init();
@@ -713,6 +778,7 @@ void destroy() {
 	shaderMulLighting.destroy();
 	shaderSkybox.destroy();
 	shaderTerrain.destroy();
+	shaderFountineParticles.destroy();
 
 	// Basic objects Delete
 	skyboxSphere.destroy();
