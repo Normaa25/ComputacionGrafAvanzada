@@ -31,4 +31,3 @@ void main(){
 	visibility = exp(-pow((distance * density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);
 }
-
