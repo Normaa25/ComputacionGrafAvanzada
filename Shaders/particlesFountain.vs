@@ -18,13 +18,13 @@ void main()
     vec3 pos = vec3(0.0);
     Transp = 0.0;
 
-	//Validar que la particula ya esta o haya llegado de inicio
-	if (Time > Startime){
-		float t = Time - Startime;
-		if (t < ParticleLifetime){
-			pos = VertexInitVel * t + Gravity * t * t;
-			Transp = 1.0 - t / ParticleLifeTime;
-		}
+	//la particula no existe hasta que llege al tiempo inicial
+	if(Time>StartTime){
+		float t=Time - StartTime;
+		if(t<ParticleLifetime){
+			pos = VertexInitVel*t +Gravity *t*t;
+			Transp= 1.0 - t /ParticleLifetime;
+			}
 	}
 
     // Draw at the current position
