@@ -83,7 +83,8 @@ Model mayowModelAnimate;
 //Boy
 Model boyAnimate;
 // Terrain model instance
-Terrain terrain(-1, -1, 200, 10, "../Textures/mapAltura.png");
+Terrain terrain(-1, -1, 200, 10, "../Textures/mapaAltura.png");
+//Terrain terrain(-1, -1, 200, 10, "../Textures/mapaAlturav2.png"); 
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;

@@ -56,8 +56,7 @@ Shader shaderSkybox;
 Shader shaderMulLighting;
 //Shader para el terreno
 Shader shaderTerrain;
-
-//Shader par ala prueba de profundidad
+//Shader para la prueba de profundidad
 Shader shaderDepthTesting;
 
 std::shared_ptr<Camera> camera(new ThirdPersonCamera());
@@ -245,8 +244,8 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	glViewport(0, 0, screenWidth, screenHeight);
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);///Se activa la prueba de profundidad
+	glEnable(GL_CULL_FACE);//Recorte de caras ocultas
 
 	// Inicialización de los shaders
 	shader.initialize("../Shaders/colorShader.vs", "../Shaders/colorShader.fs");
@@ -275,7 +274,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelAircraft.setShader(&shaderDepthTesting);
 
 	terrain.init();
-	terrain.setShader(&shaderTerrain);
+	terrain.setShader(&shaderDepthTesting);
 	terrain.setPosition(glm::vec3(100, 0, 100));
 
 	// Helicopter
@@ -321,15 +320,15 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 
 	//Lamp models
 	modelLamp1.loadModel("../models/Street-Lamp-Black/objLamp.obj");
-	modelLamp1.setShader(&shaderMulLighting);
+	modelLamp1.setShader(&shaderDepthTesting);
 	modelLamp2.loadModel("../models/Street_Light/Lamp.obj");
-	modelLamp2.setShader(&shaderMulLighting);
+	modelLamp2.setShader(&shaderDepthTesting);
 	modelLampPost2.loadModel("../models/Street_Light/LampPost.obj");
-	modelLampPost2.setShader(&shaderMulLighting);
+	modelLampPost2.setShader(&shaderDepthTesting);
 
 	//Mayow
 	mayowModelAnimate.loadModel("../models/mayow/personaje2.fbx");
-	mayowModelAnimate.setShader(&shaderMulLighting);
+	mayowModelAnimate.setShader(&shaderDepthTesting);
 
 	camera->setPosition(glm::vec3(0.0, 0.0, 10.0));
 	camera->setDistanceFromTarget(distanceFromTarget);
@@ -729,6 +728,7 @@ void destroy() {
 	modelLamp1.destroy();
 	modelLamp2.destroy();
 	modelLampPost2.destroy();
+	shaderDepthTesting.destroy();
 
 	// Custom objects animate
 	mayowModelAnimate.destroy();
@@ -1015,7 +1015,11 @@ void applicationLoop() {
 					glm::value_ptr(projection));
 		shaderTerrain.setMatrix4("view", 1, false,
 				glm::value_ptr(view));
-
+		// Settea la matriz de vista y proyeccion al shader del buffer de profundidad
+		shaderDepthTesting.setMatrix4("projection", 1, false,
+			glm::value_ptr(projection));
+		shaderDepthTesting.setMatrix4("view", 1, false,
+			glm::value_ptr(view));
 		/*******************************************
 		 * Propiedades Luz direccional
 		 *******************************************/

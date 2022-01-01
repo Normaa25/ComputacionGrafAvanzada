@@ -180,7 +180,8 @@ std::vector<float> lamp2Orientation = {21.37 + 90, -65.0 + 90};
 std::map<std::string, glm::vec3> blendingUnsorted = {
 		{"aircraft", glm::vec3(10.0, 0.0, -17.5)},
 		{"lambo", glm::vec3(23.0, 0.0, 0.0)},
-		{"heli", glm::vec3(5.0, 10.0, -5.0)}
+		{"heli", glm::vec3(5.0, 10.0, -5.0)},
+		{"fountain", glm::vec3(0.0, 0.0, 0.0)}
 };
 
 double deltaTime;
@@ -763,6 +764,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 		glGenerateMipmap(GL_TEXTURE_2D);
 	} else
 		std::cout << "Failed to load texture" << std::endl;
+
 	// Libera la memoria de la textura
 	textureTerrainBlendMap.freeImage(bitmap);
 }
@@ -1105,6 +1107,11 @@ void applicationLoop() {
 					glm::value_ptr(projection));
 		shaderTerrain.setMatrix4("view", 1, false,
 				glm::value_ptr(view));
+		// Settea la matriz de vista y projection al shader de las particulas
+		shaderFountineParticles.setMatrix4("projection", 1, false,
+			glm::value_ptr(projection));
+		shaderFountineParticles.setMatrix4("view", 1, false,
+			glm::value_ptr(view));
 
 		/*******************************************
 		 * Propiedades de neblina
@@ -1374,6 +1381,8 @@ void applicationLoop() {
 		blendingUnsorted.find("lambo")->second = glm::vec3(modelMatrixLambo[3]);
 		// Update the helicopter
 		blendingUnsorted.find("heli")->second = glm::vec3(modelMatrixHeli[3]);
+		// Update Fountain Particles
+		blendingUnsorted.find("fountain")->second = glm::vec3(5.0, 0.0, -40.0);
 
 		/**********
 		 * Sorter with alpha objects
@@ -1427,6 +1436,28 @@ void applicationLoop() {
 				modelMatrixHeliHeli = glm::rotate(modelMatrixHeliHeli, rotHelHelY, glm::vec3(0, 1, 0));
 				modelMatrixHeliHeli = glm::translate(modelMatrixHeliHeli, glm::vec3(0.0, 0.0, 0.249548));
 				modelHeliHeli.render(modelMatrixHeliHeli);
+			}
+			else if (it->second.first.compare("fountain") == 0) {
+				glm::mat4 modelMatrixFountinePar = glm::mat4(1.0);
+				modelMatrixFountinePar = glm::translate(modelMatrixFountinePar, it->second.second);
+				modelMatrixFountinePar[3][1] = terrain.getHeightTerrain(modelMatrixFountinePar[3][0], modelMatrixFountinePar[3][2] + 4.2);
+				modelMatrixFountinePar = glm::scale(modelMatrixFountinePar, glm::vec3(3.0, 3.0, 3.0));
+				currTimeParticlesAnimation = TimeManager::Instance().GetTime();
+
+				glDepthMask(GL_FALSE);
+				glPointSize(10.0f);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, textureParticleFountainID);
+				shaderFountineParticles.turnOn();
+				shaderFountineParticles.setFloat("ParticleLifetime", 10.5f);
+				shaderFountineParticles.setInt("ParticleTex", 0);
+				shaderFountineParticles.setVectorFloat3("Gravity", glm::value_ptr(glm::vec3(0.0f, -0.1f, 0.0f)));
+				shaderFountineParticles.setFloat("Time", float(currTimeParticlesAnimation - lasTimeParticlesAnimation));
+				shaderFountineParticles.setMatrix4("model", 1, false, glm::value_ptr(modelMatrixFountinePar));
+				glBindVertexArray(VAOParticles);
+				glDrawArrays(GL_POINTS, 0, nParticles);
+				glDepthMask(GL_TRUE);
+				shaderFountineParticles.turnOff();
 			}
 		}
 		glEnable(GL_CULL_FACE);
